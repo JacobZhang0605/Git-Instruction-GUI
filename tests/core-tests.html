@@ -362,7 +362,7 @@
   var failures = results.filter(function (r) { return !r.ok; });
   var summary = document.getElementById('summary');
   summary.textContent = (fail === 0 ? 'All passed  ' : 'Failures  ') + pass + ' / ' + results.length +
-    (fail ? '  —  ' + failures.map(function (r) { return r.name; }).join('；') : '');
+    (fail ? '  —  ' + failures.map(function (r) { return r.name; }).join('; ') : '');
   summary.className = fail === 0 ? 'pass' : 'fail';
   document.title = (fail === 0 ? 'PASS ' : 'FAIL ') + pass + '/' + results.length;
   var list = document.getElementById('list');

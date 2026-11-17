@@ -1,48 +1,48 @@
 ---
-name: Bug 报告
-about: 报告界面、交互或 Git 模拟器的问题
+name: Bug report
+about: Report a problem with the interface, interactions, or Git simulator
 title: "[Bug] "
 labels: bug
 assignees: ""
 ---
 
-## 问题描述
+## Description
 
-请用一两句话说明发生了什么。
+Describe what happened in one or two sentences.
 
-## 复现步骤
+## Steps to reproduce
 
-1. 打开 `index.html`（或运行本地静态服务器）
-2. 在终端输入 `...`
-3. 点击 / 看到 `...`
+1. Open `index.html` (or run a local static server)
+2. Enter `...` in the terminal
+3. Click / observe `...`
 
-## 期望行为
+## Expected behavior
 
-你原本期望看到什么？
+What did you expect to see?
 
-## 实际行为
+## Actual behavior
 
-实际发生了什么？可以附上终端输出或错误提示。
+What actually happened? Include terminal output or error messages if useful.
 
-## 截图 / 录屏
+## Screenshots / recordings
 
-如果方便，请附上截图或录屏。
+Attach a screenshot or recording if convenient.
 
-## 运行环境
+## Environment
 
-- 浏览器及版本：
-- 操作系统：
-- 页面地址（file:// 还是 http://）：
-- 是否使用了 `?demo=1` / `?fresh=1` 等调试参数：
+- Browser and version:
+- Operating system:
+- Page URL (file:// or http://):
+- Any debug parameters such as `?demo=1` / `?fresh=1`:
 
-## 浏览器控制台
+## Browser console
 
-按 F12 打开开发者工具 → Console，把红色报错贴在这里：
+Press F12 to open developer tools → Console, and paste any errors here:
 
 ```text
 
 ```
 
-## 补充信息
+## Additional context
 
-任何你认为有帮助的上下文。
+Anything else that may be relevant.

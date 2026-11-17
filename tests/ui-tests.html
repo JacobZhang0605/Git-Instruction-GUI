@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>UI tests</title>
 <style>
-  body { margin: 0; padding: 24px; font: 13px/1.5 "Segoe UI", "PingFang SC", sans-serif;
+  body { margin: 0; padding: 24px; font: 13px/1.5 "Segoe UI", system-ui, sans-serif;
          background: #f3eee2; color: #1b1a17; }
   h1 { margin: 0 0 12px; font-size: 22px; }
   #summary { position: sticky; top: 0; z-index: 2; padding: 16px 18px; margin-bottom: 16px;
@@ -21,8 +21,8 @@
 </style>
 </head>
 <body>
-<h1>Git 游乐场 · 界面交互测试</h1>
-<div id="summary">等待应用加载…</div>
+<h1>Git Interactive Tutorial · interface tests</h1>
+<div id="summary">Waiting for the app to load…</div>
 <div id="list"></div>
 <iframe id="app" src="../index.html?fresh=1" title="app under test"></iframe>
 <script>
@@ -38,8 +38,8 @@
     var fail = results.length - pass;
     var failures = results.filter(function (r) { return !r.ok; });
     var summary = document.getElementById('summary');
-    summary.textContent = (fail === 0 ? '全部通过  ' : '有失败  ') + pass + ' / ' + results.length +
-      (fail ? '  —  ' + failures.map(function (r) { return r.name; }).join('；') : '');
+    summary.textContent = (fail === 0 ? 'All passed  ' : 'Failures  ') + pass + ' / ' + results.length +
+      (fail ? '  —  ' + failures.map(function (r) { return r.name; }).join('; ') : '');
     summary.className = fail === 0 ? 'pass' : 'fail';
     document.title = (fail === 0 ? 'PASS ' : 'FAIL ') + pass + '/' + results.length;
     var list = document.getElementById('list');
@@ -60,106 +60,114 @@
     var win = frame.contentWindow;
     var doc = frame.contentDocument;
     var G = win.GitPlayground;
-    if (!G) { check('应用加载完成（debug API 存在）', false); finish(); return; }
+    if (!G) { check('App loaded (debug API present)', false); finish(); return; }
 
-    check('应用加载完成', !!doc.getElementById('card-title'));
-    check('侧栏有 8 个章节', doc.querySelectorAll('.chapter-toggle').length === 8);
-    check('卡片内容已渲染', doc.getElementById('card-content').innerHTML.length > 50);
-    check('初始状态未初始化', doc.getElementById('status-chip').textContent.indexOf('未初始化') !== -1);
+    check('App loaded', !!doc.getElementById('card-title'));
+    check('Sidebar has 8 chapters', doc.querySelectorAll('.chapter-toggle').length === 8);
+    check('Card content is rendered', doc.getElementById('card-content').innerHTML.length > 50);
+    check('Initial state is not initialized', doc.getElementById('status-chip').textContent.indexOf('Not initialized') !== -1);
 
     G.execute('git init');
-    check('git init 后状态显示 main', /main/.test(doc.getElementById('status-chip').textContent));
+    check('Status shows main after git init', /main/.test(doc.getElementById('status-chip').textContent));
     G.execute('touch readme.md');
     G.setTab('working');
-    check('工作区出现 readme.md', !!doc.querySelector('.file-row[data-file="readme.md"]'));
+    check('readme.md appears in the working directory', !!doc.querySelector('.file-row[data-file="readme.md"]'));
     G.execute('echo "hello world" > readme.md');
-    check('echo 更新文件内容', G.state.workingDir['readme.md'].content === 'hello world');
+    check('echo updates file content', G.state.workingDir['readme.md'].content === 'hello world');
 
     G.execute('git add readme.md');
-    check('add 后自动切到暂存区',
+    check('add switches the inspector to staging',
       doc.querySelector('.tab[data-tab="staging"]').classList.contains('is-active'));
-    check('暂存区出现 readme.md', !!doc.querySelector('.file-row[data-zone="staging"]'));
-    check('add 箭头点亮',
+    check('readme.md appears in the staging area', !!doc.querySelector('.file-row[data-zone="staging"]'));
+    check('add arrow is lit',
       doc.querySelector('.flow-link[data-arrow="add"]').classList.contains('is-active'));
 
     G.execute('git commit -m "Add readme"');
-    check('commit 后自动切到本地',
+    check('commit switches the inspector to local',
       doc.querySelector('.tab[data-tab="local"]').classList.contains('is-active'));
-    check('本地出现提交行', doc.querySelectorAll('.commit-row').length === 1);
-    check('commit 箭头点亮',
+    check('a commit row appears locally', doc.querySelectorAll('.commit-row').length === 1);
+    check('commit arrow is lit',
       doc.querySelector('.flow-link[data-arrow="commit"]').classList.contains('is-active'));
-    check('提交行显示 HEAD', /HEAD/.test(doc.getElementById('inspector-body').textContent));
+    check('the commit row shows HEAD', /HEAD/.test(doc.getElementById('inspector-body').textContent));
 
     var initIdx = -1;
     G.cards.forEach(function (c, i) { if (c.id === 'ch2-init') initIdx = i; });
     G.showCard(initIdx);
     G.execute('git init');
-    check('任务卡片标记完成', doc.getElementById('card-task').classList.contains('is-done'));
-    check('completed 记录 ch2-init', G.getCompleted()['ch2-init'] === true);
-    check('侧栏任务计数变化', /1 \/ 16/.test(doc.getElementById('sidebar-count').textContent));
+    check('the task card is marked complete', doc.getElementById('card-task').classList.contains('is-done'));
+    check('completed records ch2-init', G.getCompleted()['ch2-init'] === true);
+    check('sidebar task count updates', /1 \/ 16/.test(doc.getElementById('sidebar-count').textContent));
 
     G.setTab('working');
     G.openFile('readme.md', 'working');
     var fileDialog = doc.getElementById('file-dialog');
-    check('文件弹窗打开', fileDialog.open === true);
-    check('编辑器载入文件内容', doc.getElementById('file-editor').value === 'hello world');
+    check('file dialog opens', fileDialog.open === true);
+    check('editor loads the file content', doc.getElementById('file-editor').value === 'hello world');
     doc.getElementById('file-editor').value = 'edited in dialog';
     doc.getElementById('file-save').click();
-    check('文件保存生效', G.state.workingDir['readme.md'].content === 'edited in dialog');
-    check('保存后弹窗关闭', fileDialog.open === false);
+    check('saving the file takes effect', G.state.workingDir['readme.md'].content === 'edited in dialog');
+    check('dialog closes after saving', fileDialog.open === false);
+    var selection = doc.getElementById('inspector-selection');
+    check('file name is shown beside the inspector tabs',
+      selection.hidden === false &&
+      doc.getElementById('inspector-selection-name').textContent === 'readme.md' &&
+      doc.getElementById('inspector-selection-zone').textContent === 'Working Directory');
+    var toasts = doc.querySelectorAll('#toast-stack .toast');
+    var lastToast = toasts.length ? toasts[toasts.length - 1].textContent : '';
+    check('toast does not repeat the file name', lastToast.indexOf('readme.md') === -1);
 
     G.openHelp();
-    check('帮助弹窗打开', doc.getElementById('help-dialog').open === true);
-    check('帮助命令列表已填充', doc.querySelectorAll('.help-cmd').length > 20);
+    check('help dialog opens', doc.getElementById('help-dialog').open === true);
+    check('help command list is populated', doc.querySelectorAll('.help-cmd').length > 20);
     doc.getElementById('help-dialog').close();
 
     G.openCommit(G.state.HEAD);
-    check('提交详情弹窗打开', doc.getElementById('details-dialog').open === true);
-    check('提交详情包含 commit',
+    check('commit details dialog opens', doc.getElementById('details-dialog').open === true);
+    check('commit details include the commit header',
       /commit /.test(doc.getElementById('details-content').textContent));
     doc.getElementById('details-dialog').close();
 
     doc.getElementById('btn-new-file').click();
-    check('新建文件弹窗打开', doc.getElementById('prompt-dialog').open === true);
+    check('new file dialog opens', doc.getElementById('prompt-dialog').open === true);
     doc.getElementById('prompt-input').value = 'notes.txt';
     doc.getElementById('prompt-ok').click();
-    check('新文件创建成功', !!G.state.workingDir['notes.txt']);
+    check('new file is created', !!G.state.workingDir['notes.txt']);
 
     win.confirm = function () { return true; };
     G.execute('touch todelete.txt');
     G.setTab('working');
     var row = doc.querySelector('.file-row[data-file="todelete.txt"]');
-    check('待删除文件行存在', !!row);
+    check('row for the file to delete exists', !!row);
     if (row) row.querySelector('[data-action="delete"]').click();
-    check('删除文件成功', !G.state.workingDir['todelete.txt']);
+    check('file deletion succeeds', !G.state.workingDir['todelete.txt']);
 
     G.setTab('working');
     var ev = new win.MouseEvent('contextmenu', {
       bubbles: true, cancelable: true, clientX: 200, clientY: 300
     });
     doc.getElementById('inspector-body').dispatchEvent(ev);
-    check('右键菜单出现', doc.getElementById('ctx-menu').hidden === false);
+    check('context menu appears', doc.getElementById('ctx-menu').hidden === false);
     doc.body.click();
 
     var remoteTab = doc.querySelector('.tab[data-tab="remote"]');
     remoteTab.click();
-    check('点击标签切换远程', remoteTab.classList.contains('is-active'));
+    check('clicking the tab switches to remote', remoteTab.classList.contains('is-active'));
     var workingTab = doc.querySelector('.tab[data-tab="working"]');
     workingTab.click();
-    check('点击标签切回工作区', workingTab.classList.contains('is-active'));
+    check('clicking the tab switches back to working', workingTab.classList.contains('is-active'));
 
     var beforeTitle = doc.getElementById('card-title').textContent;
     doc.getElementById('card-next').click();
-    check('下一张按钮可用', doc.getElementById('card-title').textContent !== beforeTitle);
+    check('next button works', doc.getElementById('card-title').textContent !== beforeTitle);
     doc.getElementById('card-prev').click();
-    check('上一张按钮回到原卡片', doc.getElementById('card-title').textContent === beforeTitle);
+    check('previous button returns to the original card', doc.getElementById('card-title').textContent === beforeTitle);
 
     var sideCard = doc.querySelector('.chapter-card[data-card="0"]');
     if (sideCard) {
       sideCard.click();
-      check('侧栏点击跳转', doc.getElementById('card-title').textContent === G.cards[0].title);
+      check('sidebar click navigates', doc.getElementById('card-title').textContent === G.cards[0].title);
     } else {
-      check('侧栏点击跳转', false, '找不到第一张卡片的按钮');
+      check('sidebar click navigates', false, 'could not find the button for the first card');
     }
 
     var terminalInput = doc.getElementById('terminal-input');
@@ -167,45 +175,45 @@
     terminalInput.dispatchEvent(new win.KeyboardEvent('keydown', {
       key: 'Tab', bubbles: true, cancelable: true
     }));
-    check('Tab 补全子命令', terminalInput.value === 'git stash ');
+    check('Tab completes subcommands', terminalInput.value === 'git stash ');
 
     terminalInput.value = 'git add rea';
     terminalInput.dispatchEvent(new win.KeyboardEvent('keydown', {
       key: 'Tab', bubbles: true, cancelable: true
     }));
-    check('Tab 补全文件名', terminalInput.value === 'git add readme.md ');
+    check('Tab completes file names', terminalInput.value === 'git add readme.md ');
 
     terminalInput.value = 'git status';
     var submit = new win.Event('submit', { bubbles: true, cancelable: true });
     doc.getElementById('terminal-form').dispatchEvent(submit);
-    check('终端表单执行命令',
+    check('terminal form executes commands',
       /On branch/.test(doc.getElementById('terminal-output').textContent));
-    check('终端输入被清空', terminalInput.value === '');
+    check('terminal input is cleared', terminalInput.value === '');
     terminalInput.dispatchEvent(new win.KeyboardEvent('keydown', {
       key: 'ArrowUp', bubbles: true, cancelable: true
     }));
-    check('↑ 调出命令历史', terminalInput.value === 'git status');
+    check('↑ recalls command history', terminalInput.value === 'git status');
 
     var chapter2 = doc.querySelector('.chapter-toggle[data-chapter="2"]');
     if (chapter2) {
       var wasOpen = chapter2.classList.contains('is-open');
       chapter2.click();
       var chapter2After = doc.querySelector('.chapter-toggle[data-chapter="2"]');
-      check('章节可以折叠/展开',
+      check('chapters can collapse and expand',
         chapter2After && chapter2After.classList.contains('is-open') !== wasOpen);
     } else {
-      check('章节可以折叠/展开', false, '找不到第 2 章按钮');
+      check('chapters can collapse and expand', false, 'could not find the chapter 2 button');
     }
 
     finish();
   }
 
   window.addEventListener('load', function () {
-    // 父页面的 load 事件一定在 iframe 文档加载完成后触发；
-    // 这里同步跑测试，保证无头截图能拍到最终结果。
+    // The parent load event always fires after the iframe document has loaded;
+    // run the tests synchronously so headless screenshots capture the final state.
     var win = frame.contentWindow;
     if (win && win.GitPlayground) run();
-    else { check('应用加载完成（debug API 存在）', false); finish(); }
+    else { check('App loaded (debug API present)', false); finish(); }
   });
 })();
 </script>
