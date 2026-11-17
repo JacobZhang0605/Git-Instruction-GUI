@@ -73,6 +73,7 @@
     terminalBody: $('terminal-body'),
     terminalForm: $('terminal-form'),
     terminalInput: $('terminal-input'),
+    logSession: $('log-session'),
     chips: $('chips'),
     helpDialog: $('help-dialog'),
     helpCommands: $('help-commands'),
@@ -609,6 +610,20 @@
     termHistoryIndex = parser.history.length;
   }
 
+  function appendQuickReference() {
+    appendTerminalLine('Quick reference', 't-ref');
+    appendTerminalLine('  git init             initialize a repository', 't-ref');
+    appendTerminalLine('  git status           inspect the working tree', 't-ref');
+    appendTerminalLine('  git add .            stage changes', 't-ref');
+    appendTerminalLine('  git commit -m "msg"  record a snapshot', 't-ref');
+    appendTerminalLine('  git log              browse commit history', 't-ref');
+    appendTerminalLine('  git push             publish to a remote', 't-ref');
+    appendTerminalLine('  git pull             fetch and merge updates', 't-ref');
+    appendTerminalLine('', '');
+    appendTerminalLine('Type help for the full command reference.', 't-muted');
+    appendTerminalLine('', '');
+  }
+
   function welcome() {
     clearTerminal();
     appendTerminalLine('Git Interactive Tutorial', 't-ok');
@@ -621,6 +636,7 @@
       appendTerminalLine('Start with: git init', 't-muted');
     }
     appendTerminalLine('', '');
+    appendQuickReference();
   }
 
   function checkTask(input) {
@@ -799,9 +815,60 @@
     return '<span class="file-badge">' + s[2] + '</span>';
   }
 
+  function renderLogSide() {
+    if (!els.logSession) return;
+    var initialized = state.initialized;
+    var branch = initialized ? (state.currentBranch || 'detached HEAD') : '—';
+    var head = state.HEAD ? state.HEAD.substring(0, 7) : '—';
+    var status;
+    if (!initialized) {
+      status = 'Not initialized';
+    } else if (state.mergeConflict && state.mergeConflict.length > 0) {
+      status = state.mergeConflict.length +
+        (state.mergeConflict.length === 1 ? ' conflict' : ' conflicts');
+    } else {
+      status = isDirty() ? 'Dirty' : 'Clean';
+    }
+
+    var done = Object.keys(completed).length;
+    var taskTotal = cards.filter(function (c) { return !!c.task; }).length;
+    var pct = taskTotal ? Math.round((done / taskTotal) * 100) : 0;
+
+    var lastCmd = parser.history.length
+      ? parser.history[parser.history.length - 1]
+      : '—';
+
+    els.logSession.innerHTML =
+      '<div class="log-side-section">' +
+        '<h3 class="log-side-title">Session</h3>' +
+        '<dl class="log-kv">' +
+          '<div><dt>Branch</dt><dd>' + escapeHtml(branch) + '</dd></div>' +
+          '<div><dt>HEAD</dt><dd>' + escapeHtml(head) + '</dd></div>' +
+          '<div><dt>Status</dt><dd>' + escapeHtml(status) + '</dd></div>' +
+          '<div><dt>Tasks</dt><dd>' + done + ' / ' + taskTotal + '</dd></div>' +
+          '<div><dt>Last</dt><dd>' + escapeHtml(lastCmd) + '</dd></div>' +
+        '</dl>' +
+        '<div class="log-progress"><span style="width:' + pct + '%"></span></div>' +
+      '</div>' +
+      '<div class="log-side-section">' +
+        '<h3 class="log-side-title">Repository</h3>' +
+        '<div class="log-counts">' +
+          '<div class="log-count"><span>' + Object.keys(state.workingDir).length +
+            '</span><small>Working</small></div>' +
+          '<div class="log-count"><span>' + Object.keys(state.staging).length +
+            '</span><small>Staged</small></div>' +
+          '<div class="log-count"><span>' + state.commits.length +
+            '</span><small>Commits</small></div>' +
+          '<div class="log-count"><span>' + (state.remote.commits || []).length +
+            '</span><small>Remote</small></div>' +
+        '</div>' +
+      '</div>';
+  }
+
   var lastInspectorTab = null;
 
   function renderInspector() {
+    renderLogSide();
     var keepScroll = lastInspectorTab === inspectorTab
       ? els.inspectorBody.scrollTop : 0;
     lastInspectorTab = inspectorTab;
@@ -1011,6 +1078,7 @@
     els.fileNote.textContent = editable
       ? 'Click “Save” to write your changes back to the working directory; then run git add / git commit.'
       : 'Files in the staging area are read-only. Edit the file in the working directory and run git add again.';
+    renderInspector();
     els.fileDialog.showModal();
   }
 
@@ -1075,7 +1143,7 @@
   function deleteFile(name) {
     if (!confirm('Delete “' + name + '”? A tracked file will remain as a pending deletion.')) return;
     var r = state.deleteFile(name);
-    if (r && r.output) toast(r.output, r.success ? 'ok' : 'error');
+    if (r) toast(r.success ? 'File deleted' : 'Could not delete the file', r.success ? 'ok' : 'error');
     if (selectedFile && selectedFile.name === name) clearSelection();
     renderInspector();
     renderFlow();
@@ -1127,7 +1195,9 @@
 
   $('btn-clear').addEventListener('click', function () {
     clearTerminal();
-    appendTerminalLine('Terminal cleared.', 't-muted');
+    appendTerminalLine('Log cleared.', 't-muted');
+    appendTerminalLine('', '');
+    appendQuickReference();
     els.terminalInput.focus();
   });
 
@@ -1283,7 +1353,7 @@
                pull: false, clone: false, restore: false };
     state.resetAll();
     state.init();
-    state.createFile('README.md', '# Git Playground\n\nThis is my first repository.');
+    state.createFile('README.md', '# My First Repository\n\nThis is my first repository.');
     state.add('README.md');
     state.commit('Add README');
     state.createFile('notes.txt', 'TODO: learn add / commit / push');
@@ -1293,7 +1363,7 @@
     state.remote.url = 'git@github.com:demo/playground.git';
     state.push('origin', 'main');
     state.createFile('todo.md', '- Practice branching\n- Practice pull');
-    state.modifyFile('README.md', '# Git Playground\n\nThis is my first repository.\n\nNow I can commit.');
+    state.modifyFile('README.md', '# My First Repository\n\nThis is my first repository.\n\nNow I can commit.');
     arrows.add = true;
     arrows.commit = true;
     arrows.push = true;

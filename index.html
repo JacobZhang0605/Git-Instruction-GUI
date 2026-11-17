@@ -57,110 +57,123 @@
 
       <!-- Right: workspace -->
       <main class="workspace">
-        <!-- Data flow -->
-        <section class="card flow-card" aria-label="Git data flow">
+        <!-- Enlarged data flow with the embedded repository inspector -->
+        <section class="card flow-card" aria-label="Git data flow and repository inspector">
           <div class="panel-head">
             <span class="kicker">Data flow</span>
             <span class="panel-hint">A lit arrow means you have used that command</span>
           </div>
 
-          <div class="flow" id="flow">
-            <div class="flow-node node-working" data-zone="working">
-              <span class="node-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h4l2 2h7A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>
-              </span>
-              <span class="node-name">Working Directory</span>
-              <span class="node-count" id="count-working">0</span>
+          <div class="flow-layout">
+            <div class="flow-main">
+              <div class="flow" id="flow">
+                <div class="flow-node node-working" data-zone="working">
+                  <span class="node-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h4l2 2h7A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>
+                  </span>
+                  <span class="node-name">Working Directory</span>
+                  <span class="node-desc">Edited files</span>
+                  <span class="node-count" id="count-working">0</span>
+                </div>
+
+                <div class="flow-link" data-arrow="add">
+                  <span class="flow-line" aria-hidden="true"></span>
+                  <span class="flow-label">git add</span>
+                </div>
+
+                <div class="flow-node node-staging" data-zone="staging">
+                  <span class="node-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2"/></svg>
+                  </span>
+                  <span class="node-name">Staging Area</span>
+                  <span class="node-desc">Ready to commit</span>
+                  <span class="node-count" id="count-staging">0</span>
+                </div>
+
+                <div class="flow-link" data-arrow="commit">
+                  <span class="flow-line" aria-hidden="true"></span>
+                  <span class="flow-label">git commit</span>
+                </div>
+
+                <div class="flow-node node-local" data-zone="local">
+                  <span class="node-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>
+                  </span>
+                  <span class="node-name">Local Repository</span>
+                  <span class="node-desc">Snapshot history</span>
+                  <span class="node-count" id="count-local">0</span>
+                </div>
+
+                <div class="flow-link" data-arrow="push">
+                  <span class="flow-line" aria-hidden="true"></span>
+                  <span class="flow-label">git push</span>
+                </div>
+
+                <div class="flow-node node-remote" data-zone="remote">
+                  <span class="node-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.6-8 6 6 0 0 1 11.5 1.2A3.5 3.5 0 0 1 18 18z"/></svg>
+                  </span>
+                  <span class="node-name">Remote</span>
+                  <span class="node-desc">Server copy</span>
+                  <span class="node-count" id="count-remote">0</span>
+                </div>
+              </div>
+
+              <div class="flow-return">
+                <span class="return-note">Reverse</span>
+                <span class="return-arrow" aria-hidden="true">←</span>
+                <span class="return-chip" data-arrow="pull">git pull</span>
+                <span class="return-chip" data-arrow="clone">git clone</span>
+                <span class="return-chip" data-arrow="restore">git restore</span>
+              </div>
             </div>
 
-            <div class="flow-link" data-arrow="add">
-              <span class="flow-line" aria-hidden="true"></span>
-              <span class="flow-label">git add</span>
-            </div>
-
-            <div class="flow-node node-staging" data-zone="staging">
-              <span class="node-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2"/></svg>
-              </span>
-              <span class="node-name">Staging Area</span>
-              <span class="node-count" id="count-staging">0</span>
-            </div>
-
-            <div class="flow-link" data-arrow="commit">
-              <span class="flow-line" aria-hidden="true"></span>
-              <span class="flow-label">git commit</span>
-            </div>
-
-            <div class="flow-node node-local" data-zone="local">
-              <span class="node-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>
-              </span>
-              <span class="node-name">Local Repository</span>
-              <span class="node-count" id="count-local">0</span>
-            </div>
-
-            <div class="flow-link" data-arrow="push">
-              <span class="flow-line" aria-hidden="true"></span>
-              <span class="flow-label">git push</span>
-            </div>
-
-            <div class="flow-node node-remote" data-zone="remote">
-              <span class="node-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.6-8 6 6 0 0 1 11.5 1.2A3.5 3.5 0 0 1 18 18z"/></svg>
-              </span>
-              <span class="node-name">Remote</span>
-              <span class="node-count" id="count-remote">0</span>
-            </div>
-          </div>
-
-          <div class="flow-return">
-            <span class="return-note">Reverse</span>
-            <span class="return-arrow" aria-hidden="true">←</span>
-            <span class="return-chip" data-arrow="pull">git pull</span>
-            <span class="return-chip" data-arrow="clone">git clone</span>
-            <span class="return-chip" data-arrow="restore">git restore</span>
+            <section class="inspector-card" aria-label="Repository inspector">
+              <div class="inspector-head">
+                <span class="kicker">Repository inspector</span>
+                <button type="button" class="btn btn-mini" id="btn-new-file" title="Create a file in the working directory">
+                  + New
+                </button>
+              </div>
+              <div class="inspector-tabs" id="inspector-tabs" role="tablist">
+                <button type="button" class="tab tab-working is-active" data-tab="working" role="tab">Working<span class="tab-count" id="tab-count-working">0</span></button>
+                <button type="button" class="tab tab-staging" data-tab="staging" role="tab">Staging<span class="tab-count" id="tab-count-staging">0</span></button>
+                <button type="button" class="tab tab-local" data-tab="local" role="tab">Local<span class="tab-count" id="tab-count-local">0</span></button>
+                <button type="button" class="tab tab-remote" data-tab="remote" role="tab">Remote<span class="tab-count" id="tab-count-remote">0</span></button>
+              </div>
+              <div class="inspector-selection" id="inspector-selection" hidden>
+                <span class="inspector-selection-label">File</span>
+                <span class="inspector-selection-name" id="inspector-selection-name"></span>
+                <span class="inspector-selection-zone" id="inspector-selection-zone"></span>
+              </div>
+              <div class="inspector-body" id="inspector-body" role="tabpanel"></div>
+            </section>
           </div>
         </section>
 
-        <!-- Tutorial card -->
-        <section class="card coach-card" aria-label="Tutorial card">
-          <div class="coach-head">
-            <div class="coach-meta">
-              <span class="chapter-chip" id="card-chapter">Chapter 1</span>
-              <span class="coach-index" id="card-index">1 / 36</span>
-            </div>
-            <h2 id="card-title">Welcome</h2>
-            <div class="coach-nav">
-              <button type="button" class="btn btn-nav" id="card-prev" aria-label="Previous card">←</button>
-              <button type="button" class="btn btn-nav" id="card-next" aria-label="Next card">→</button>
-            </div>
-          </div>
-          <div class="coach-body" id="card-content" tabindex="0"></div>
-          <div class="coach-task" id="card-task" hidden>
-            <span class="task-label">Task</span>
-            <span class="task-prompt" id="task-prompt"></span>
-            <span class="task-state" id="task-state"></span>
-          </div>
-        </section>
-
-        <!-- Terminal and inspector -->
+        <!-- Log and tutorial card -->
         <div class="bottom-grid">
-          <section class="card terminal-card" aria-label="Simulated terminal">
+          <section class="card terminal-card log-card" aria-label="Activity log and command console">
             <div class="terminal-head">
               <span class="terminal-dots" aria-hidden="true">
                 <i></i><i></i><i></i>
               </span>
-              <span class="terminal-title">Terminal</span>
+              <span class="terminal-title">Log</span>
               <button type="button" class="btn btn-mini" id="btn-clear">Clear</button>
             </div>
-            <div class="terminal-body" id="terminal-body">
-              <div class="terminal-output" id="terminal-output" aria-live="polite"></div>
-              <form class="terminal-form" id="terminal-form" autocomplete="off">
-                <span class="terminal-prompt" aria-hidden="true">$</span>
-                <input id="terminal-input" class="terminal-input" type="text"
-                       spellcheck="false" autocapitalize="off" autocorrect="off"
-                       placeholder="Enter a Git command…" aria-label="Enter a Git command">
-              </form>
+            <div class="log-body">
+              <div class="terminal-body" id="terminal-body">
+                <div class="terminal-output" id="terminal-output" aria-live="polite"></div>
+                <form class="terminal-form" id="terminal-form" autocomplete="off">
+                  <span class="terminal-prompt" aria-hidden="true">$</span>
+                  <input id="terminal-input" class="terminal-input" type="text"
+                         spellcheck="false" autocapitalize="off" autocorrect="off"
+                         placeholder="Enter a Git command…" aria-label="Enter a Git command">
+                </form>
+              </div>
+              <aside class="log-side" aria-label="Session summary">
+                <div id="log-session"></div>
+              </aside>
             </div>
             <div class="chips" id="chips" aria-label="Common commands">
               <button type="button" class="chip" data-cmd="git status">git status</button>
@@ -172,27 +185,30 @@
               <button type="button" class="chip" data-cmd="git pull origin main">git pull</button>
               <button type="button" class="chip" data-cmd="help">help</button>
             </div>
+            <div class="log-foot" id="log-foot">
+              <span>Copyright © 2026 Jacobus Laurence</span>
+              <span>Shanghai Jiao Tong University · SJTU</span>
+            </div>
           </section>
 
-          <section class="card inspector-card" aria-label="Repository inspector">
-            <div class="inspector-head">
-              <span class="kicker">Repository inspector</span>
-              <button type="button" class="btn btn-mini" id="btn-new-file" title="Create a file in the working directory">
-                + New
-              </button>
+          <section class="card coach-card" aria-label="Tutorial card">
+            <div class="coach-head">
+              <div class="coach-meta">
+                <span class="chapter-chip" id="card-chapter">Chapter 1</span>
+                <span class="coach-index" id="card-index">1 / 36</span>
+              </div>
+              <h2 id="card-title">Welcome</h2>
+              <div class="coach-nav">
+                <button type="button" class="btn btn-nav" id="card-prev" aria-label="Previous card">←</button>
+                <button type="button" class="btn btn-nav" id="card-next" aria-label="Next card">→</button>
+              </div>
             </div>
-            <div class="inspector-tabs" id="inspector-tabs" role="tablist">
-              <button type="button" class="tab tab-working is-active" data-tab="working" role="tab">Working<span class="tab-count" id="tab-count-working">0</span></button>
-              <button type="button" class="tab tab-staging" data-tab="staging" role="tab">Staging<span class="tab-count" id="tab-count-staging">0</span></button>
-              <button type="button" class="tab tab-local" data-tab="local" role="tab">Local<span class="tab-count" id="tab-count-local">0</span></button>
-              <button type="button" class="tab tab-remote" data-tab="remote" role="tab">Remote<span class="tab-count" id="tab-count-remote">0</span></button>
+            <div class="coach-body" id="card-content" tabindex="0"></div>
+            <div class="coach-task" id="card-task" hidden>
+              <span class="task-label">Task</span>
+              <span class="task-prompt" id="task-prompt"></span>
+              <span class="task-state" id="task-state"></span>
             </div>
-            <div class="inspector-selection" id="inspector-selection" hidden>
-              <span class="inspector-selection-label">File</span>
-              <span class="inspector-selection-name" id="inspector-selection-name"></span>
-              <span class="inspector-selection-zone" id="inspector-selection-zone"></span>
-            </div>
-            <div class="inspector-body" id="inspector-body" role="tabpanel"></div>
           </section>
         </div>
       </main>

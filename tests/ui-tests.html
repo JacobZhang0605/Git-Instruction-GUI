@@ -65,6 +65,17 @@
     check('App loaded', !!doc.getElementById('card-title'));
     check('Sidebar has 8 chapters', doc.querySelectorAll('.chapter-toggle').length === 8);
     check('Card content is rendered', doc.getElementById('card-content').innerHTML.length > 50);
+    check('Repository inspector is embedded in the data flow card',
+      !!doc.querySelector('.flow-card .inspector-card'));
+    check('Log card is the first bottom panel',
+      doc.querySelector('.bottom-grid').firstElementChild.classList.contains('log-card'));
+    check('Log footer shows the copyright and SJTU',
+      /Copyright © 2026 Jacobus Laurence/.test(doc.getElementById('log-foot').textContent) &&
+      /SJTU/.test(doc.getElementById('log-foot').textContent));
+    check('Log side rail shows the session summary',
+      /Session/.test(doc.getElementById('log-session').textContent) &&
+      /Branch/.test(doc.getElementById('log-session').textContent) &&
+      /Repository/.test(doc.getElementById('log-session').textContent));
     check('Initial state is not initialized', doc.getElementById('status-chip').textContent.indexOf('Not initialized') !== -1);
 
     G.execute('git init');
